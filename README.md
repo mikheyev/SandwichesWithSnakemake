@@ -9,16 +9,6 @@ Like Make, the actors in Snakemake are *usually* files. In this example:
 * The ingredients are files
 * The sandwiches are files
 
-#### Installation
-Follow the installation instructions here:
-https://bitbucket.org/johanneskoester/snakemake/wiki/Documentation#markdown-header-installation
-
-If you plan on using R within Snakemake take a look at [this](SETUP.md).
-
-Clone this lesson:
-```
-git clone https://github.com/leipzig/SnakemakeMiniLesson.git
-````
 ### Tutorial
 #### Explicit targets (see [basic.snake](basic.snake))
 This is my snakefile:
@@ -170,34 +160,18 @@ You can try this with:
 (snake-env)$ snakemake -s config.snake --config list=A
 ```
 
-##### Use a sentinel (see [sentinel.snake](sentinel.snake))
-The sentinel strategy, popular in Make, creates an output file as a fake target or "sentinel" from our list file and for input we employ a vanilla Python function `get_sandwiches` that returns a list of sandwiches.
+## Using Snakemake on Sango (or other cluster)
 
-The wildcards argument sent to `get_sandwiches` is evaluated with all possible wildcards from all rules before the workflow is started, so it should be written in a manner that minimizes ambiguity. Writing `get_sandwiches` is easier if we maintain consistent naming conventions, i.e. we suffix kid lists with .List.txt. Our sentinel, and the target we ask Snakemake to produce, will be `A.Kid.List` in order to process a file called `A.Kid.List.txt`.
+One of the excellent benefits of Snakemake is that it is aware of cluster computing.
+
+We are going to use the DRMAA interface to snakemake, which requires a library to be installed.
+
 ```
-#Usage: snakemake -s sentinel.snake A.Kid.List
-import os
-import fnmatch
-
-def get_sandwiches(wildcards):
-    #these get evaluated with wildcards from every rule
-    #so be careful to open only the list file
-    for wildcard in wildcards:
-        if os.path.exists(wildcard+'.txt') and fnmatch.fnmatch(wildcard+'.txt', '*.List.txt'):
-            kids = [line.strip() for line in open(wildcard+".txt").readlines()]
-            sandwiches = [kid+'.pbandj' for kid in kids]
-            return(sandwiches)
-    return("")
-
-rule listfile:
-     input: get_sandwiches
-     output: "{listfile}"
-     shell: "touch {output}"
-
-...
-```
-You can try this with:
-```
-(snake-env)$ snakemake -s sentinel.snake A.Kid.List
+export DRMAA_LIBRARY_PATH=/apps/unit/MikheyevU/miquel/slurm-drmaa-1.0.7/lib/libdrmaa.so.1.0.6
 ```
 
+You can add this command to your PATH. You can then run
+
+```
+snakemake -j 20 -s basic.snake --cluster-config cluster.json --drmaa "--mem={cluster.mem} --mincpus={cluster.cpus-per-task} --partition={cluster.partition}"
+```
