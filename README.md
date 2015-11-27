@@ -121,9 +121,9 @@ Calling snakemake with the following targets:
 
 ### How can we derive targets from existing source files?  (see [glob.snake](glob.snake))
 
-Snakemake is Python, so we can simply use Python's `glob` function to read a directory contents and then transform the names into targets
+Snakemake is Python, so we can simply use snakemake's `glob_wildcards` function to read a directory contents and then transform the names into targets
 ```
-KIDS = glob.glob('kids/*')
+KIDS, = glob_wildcards("kids/{name}")
 SANDWICHES = [os.path.basename(kid)+'.pbandj' for kid in KIDS]
 
 ...
@@ -143,8 +143,9 @@ You can try this with:
 ```
 (snake-env)$ snakemake -s listfile.snake
 ```
+
 #### How do I tell Snakemake which list of kids to process as a command line argument?
-There are (at least) two ways we can accomplish this:
+
 ##### Use a configuration parameter (see [config.snake](config.snake))
 Snakemake autosets a global variable `config`, even if no configfile is loaded. This can be used to pass arguments to the snakefile.
 ```
@@ -160,18 +161,26 @@ You can try this with:
 (snake-env)$ snakemake -s config.snake --config list=A
 ```
 
-## Using Snakemake on Sango (or other cluster)
+## Using Snakemake on Tombo
 
 One of the excellent benefits of Snakemake is that it is aware of cluster computing.
 
-We are going to use the DRMAA interface to snakemake, which requires a library to be installed.
+We are going to use the DRMAA interface to snakemake, which requires a Python library to be installed Using
 
 ```
-export DRMAA_LIBRARY_PATH=/apps/unit/MikheyevU/miquel/slurm-drmaa-1.0.7/lib/libdrmaa.so.1.0.6
+easy_install --user drmaa
+```
+
+We'll also need to add the drmaa library path:
+
+```
+export DRMAA_LIBRARY_PATH=export DRMAA_LIBRARY_PATH=/opt/shared/slurm/lib/libdrmaa.so.1.0.6
 ```
 
 You can add this command to your PATH. You can then run
 
 ```
-snakemake -j 20 -s basic.snake --cluster-config cluster.json --drmaa "--mem={cluster.mem} --mincpus={cluster.cpus-per-task} --partition={cluster.partition}"
+snakemake -j 20 -s basic.snake --latency-wait 10 --cluster-config cluster.json --drmaa "--mem={cluster.mem} --mincpus={cluster.cpus-per-task} --partition={cluster.partition}"
 ```
+
+How was this command different from the others?

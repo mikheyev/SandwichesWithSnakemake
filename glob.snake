@@ -1,7 +1,7 @@
 import glob
 import re
 
-KIDS = glob.glob('kids/*')
+KIDS, = glob_wildcards("kids/{name}")
 SANDWICHES = [os.path.basename(kid)+'.pbandj' for kid in KIDS]
 
 rule all:
