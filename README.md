@@ -174,7 +174,7 @@ easy_install --user drmaa
 We'll also need to add the drmaa library path:
 
 ```
-export DRMAA_LIBRARY_PATH=export DRMAA_LIBRARY_PATH=/opt/shared/slurm/lib/libdrmaa.so.1.0.6
+export DRMAA_LIBRARY_PATH=/opt/shared/slurm/lib/libdrmaa.so.1.0.6
 ```
 
 You can add this command to your PATH. You can then run
