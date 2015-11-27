@@ -3,11 +3,11 @@
     {
         "n" : 1,
         "partition" : "compute",
-        "mem" : "4G",
+        "mem" : "4000",
         "cpus-per-task": 1
     },
     "peanut_butter_and_jelly_sandwich_recipe" :
     {
-        "mem" : "2G"
+        "mem" : "2000"
     }
 }
